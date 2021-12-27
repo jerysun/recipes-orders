@@ -70,7 +70,7 @@ export class AuthService {
         errorMessage = 'This email address does not exist!';
         break;
       case 'INVALID_PASSWORD':
-        errorMessage = 'This password is not correct.'
+        errorMessage = 'This password is not correct.';
         break;
     }
     return throwError(errorMessage);
