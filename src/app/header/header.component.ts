@@ -14,7 +14,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(private dataStorageService: DataStorageService, private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.authService.user.subscribe(user => this.isAuthenticated = user.token != null);
+    this.authService.user.subscribe(user => this.isAuthenticated = user != null);
   }
 
   onSaveData(): void {

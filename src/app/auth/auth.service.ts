@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, Subject, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { User } from './user.model';
 
@@ -23,7 +23,7 @@ export class AuthService {
     'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=';
   private signInBaseUrl =
     'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=';
-  user = new Subject<User>();
+  user = new BehaviorSubject<User>(null);
 
   constructor(private http: HttpClient) {}
 
@@ -52,7 +52,7 @@ export class AuthService {
 
   private handleAuthentication(email: string, userId: string, token: string, expiresIn: number): void {
     // The unit of getTime() return value is millisecond while the unit of expiresIn is seconds
-    const expirationData = new Date (new Date(new Date().getTime() + expiresIn * 1000));
+    const expirationData = new Date (new Date().getTime() + expiresIn * 1000);
     const user = new User(email, userId, token, expirationData);
     this.user.next(user);
   }

@@ -1,7 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { exhaustMap, map, take, tap } from 'rxjs/operators';
+import { AuthService } from '../auth/auth.service';
 import { Recipe } from '../recipes/recipe.model';
 import { RecipeService } from '../recipes/recipe.service';
 
@@ -10,26 +11,32 @@ import { RecipeService } from '../recipes/recipe.service';
 })
 export class DataStorageService {
   baseUrl = 'https://ng-course-recipe-book-bd9d1-default-rtdb.europe-west1.firebasedatabase.app/';
-  constructor(private http: HttpClient, private recipeService: RecipeService) { }
+
+  constructor(private http: HttpClient, private recipeService: RecipeService, private authService: AuthService) { }
 
   storeRecipes(): void {
     const recipes = this.recipeService.getRecipes();
-    this.http.put(`${this.baseUrl}recipes.json`, recipes)
+    this.http.put(`${this.baseUrl}recipes.json`, recipes, {
+
+    })
       .subscribe(response => {
         console.log(response);
       });
   }
 
   fetchRecipes(): Observable<Recipe[]> {
-    return this.http.get<Recipe[]>(`${this.baseUrl}recipes.json`)
-      .pipe(map(recipes => {
-        return recipes.map(recipe => {
-          return {...recipe, ingredients: recipe.ingredients ?? []};
-        });
-      }), tap(recipes => {
-        this.recipeService.setRecipes(recipes);
-      })
-    );
+    return this.authService.user.pipe(take(1),
+      exhaustMap(user => {
+        return this.http.get<Recipe[]>(`${this.baseUrl}recipes.json`, {
+          params: new HttpParams().set('auth', user.token)
+      });
+    }), map(recipes => {
+      return recipes.map(recipe => {
+        return {...recipe, ingredients: recipe.ingredients ?? []};
+      });
+    }), tap(recipes => {
+      this.recipeService.setRecipes(recipes);
+    }));
   }
 
 }
