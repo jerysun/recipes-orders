@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 import { UserDto } from './user-dto';
 import { User } from './user.model';
 
@@ -20,7 +21,7 @@ export interface AuthResponseData {
   providedIn: 'root',
 })
 export class AuthService {
-  private API_KEY = 'AIzaSyC8A3iBM_CahOLbkwoL2K1rNppsgEe-H1Q';
+  private API_KEY = environment.firebaseAPIKey;
   private signUpBaseUrl =
     'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=';
   private signInBaseUrl =
